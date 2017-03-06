@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <displayName>BlackWhiteBox-project</displayName>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.coravy.hudson.plugins.github.GithubProjectProperty plugin="github@1.15.0">
+      <projectUrl>https://github.com/blackang-us/blackwhitebox-sonata/</projectUrl>
+      <displayName></displayName>
+    </com.coravy.hudson.plugins.github.GithubProjectProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@2.4.1">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>https://github.com/blackang-us/blackwhitebox-sonata.git</url>
+        <credentialsId>cc1e8474-7e2a-4a0f-a4da-1ae55b128cc5</credentialsId>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/develop</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions/>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers>
+    <com.cloudbees.jenkins.GitHubPushTrigger plugin="github@1.15.0">
+      <spec></spec>
+    </com.cloudbees.jenkins.GitHubPushTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <customWorkspace>/home/ba-master/sites//blackwhitebox</customWorkspace>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>### Passage de l&apos;environnement en prod
+export SYMFONY_ENV=prod
+
+### instalation des vendors, clear du cache et installation des assets
+composer install --no-dev --no-scripts
+
+bin/console cache:clear --env=prod
+
+### gestion des outils frontend
+bower install
+npm install
+brunch build -P
+
+### link des assets
+php bin/console assets:install --symlink
+
+### mise a jour du schéma
+bin/console d:s:u --force
+
+### chargement des fixtures
+bin/console d:f:l --fixtures=src/BAUserBundle/DataFixtures/ORM --fixtures=src/BWBAppBundle/Datafixtures/ORM -n</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.Mailer plugin="mailer@1.16">
+      <recipients>jm@blackang.us</recipients>
+      <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
+      <sendToIndividuals>true</sendToIndividuals>
+    </hudson.tasks.Mailer>
+  </publishers>
+  <buildWrappers/>
+</project>

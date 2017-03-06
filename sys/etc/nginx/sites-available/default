@@ -1,0 +1,22 @@
+
+server {
+    server_name localhost;
+    root /home/jmp-master/sites/jmprevost.com/www;
+
+    location / {
+        try_files $uri @rewriteapp;
+    }
+
+    location / {
+        index  index.php;
+    }
+    
+    # Pass the PHP scripts to FastCGI server
+    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php5-fpm.sock;
+        fastcgi_split_path_info ^(.+\.php)(/.*)$;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME /usr/share/phpmyadmin$fastcgi_script_name;
+        fastcgi_param  HTTPS off;
+    }
+}
