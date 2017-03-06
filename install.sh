@@ -53,6 +53,7 @@ echo -e "      \033[33m#### Install server : end install whois / mkpasswd ####\0
 if $debug; then
     echo "press a key to continue..."
 fi
+apt-get install makepasswd
 
 if $mysql_pass; then
     password_mysql = $(mkpasswd -l 10 -d 3 -c 2 -C 2 -s 2)
